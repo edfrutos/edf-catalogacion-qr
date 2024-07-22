@@ -1,0 +1,36 @@
+project_root/
+│
+├── app/
+│   ├── __init__.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── routes.py
+│   ├── templates/
+│   │   ├── layout.html
+│   │   ├── home.html
+│   │   ├── about.html
+│   │   ├── register.html
+│   │   ├── login.html
+│   │   ├── account.html
+│   │   ├── reset_request.html
+│   │   ├── change_password2.html
+│   │   ├── contacto.html
+│   │   ├── container_detail.html
+│   │   ├── create_container.html
+│   │   ├── list_containers.html
+│   │   ├── edit_container.html
+│   │   ├── delete_account.html
+│   │   ├── search_container.html
+│   │   ├── welcome.html
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── style.css
+│   │   ├── images/
+│   │   │   └── logo.png
+│   │   └── qr_codes/
+│   ├── utils.py
+│   └── token.py
+│
+├── config.py
+├── run.py
+└── .env
