@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Admin - List Users{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1>List of Users</h1>
+    <ul class="list-group">
+        {% for user in users %}
+            <li class="list-group-item">
+                {{ user.username }} - {{ user.email }}
+                <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="btn btn-sm btn-primary float-right">Edit</a>
+                <a href="{{ url_for('admin.view_user', user_id=user.id) }}" class="btn btn-sm btn-secondary float-right mr-2">View</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

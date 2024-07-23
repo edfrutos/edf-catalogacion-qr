@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Buscar Contenedores</h2>
+    <form method="POST" action="{{ url_for('main.search_container') }}">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.search.label(class="form-control-label") }}
+            {{ form.search(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+    </form>
+
+    <h2 class="mt-4">Resultados de la Búsqueda</h2>
+    <ul class="list-group">
+        {% for container in containers %}
+        <li class="list-group-item">
+            <h5>{{ container.name }}</h5>
+            <p>Ubicación: {{ container.location }}</p>
+            <p>Objetos: {{ container.items | join(', ') }}</p>
+        </li>
+        {% else %}
+        <li class="list-group-item">
+            <p>No se encontraron contenedores.</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

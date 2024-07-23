@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <h1>Mis Contenedores</h1>
+    <a href="{{ url_for('main.create_container') }}" class="btn btn-primary">Crear Contenedor</a>
+    <div class="row mt-3">
+        {% for container in containers %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if container.image_file %}
+                <img src="{{ url_for('static', filename='images/' + container.image_file) }}" class="card-img-top" alt="...">
+                {% else %}
+                <img src="{{ url_for('static', filename='images/default.png') }}" class="card-img-top" alt="...">
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ container.name }}</h5>
+                    <p class="card-text">{{ container.location }}</p>
+                    <div class="mt-auto">
+                        <a href="{{ url_for('main.container_detail', container_id=container.id) }}" class="btn btn-primary">Detalles</a>
+                        <a href="{{ url_for('main.print_container', container_id=container.id) }}" class="btn btn-secondary" target="_blank">Imprimir</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
