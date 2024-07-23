@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Editar Usuario</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.username.label }} {{ form.username() }}
+    </div>
+    <div>
+        {{ form.email.label }} {{ form.email() }}
+    </div>
+    <div>
+        {{ form.address.label }} {{ form.address() }}
+    </div>
+    <div>
+        {{ form.phone.label }} {{ form.phone() }}
+    </div>
+    <button type="submit">Guardar Cambios</button>
+</form>
+{% endblock %}
