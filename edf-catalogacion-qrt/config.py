@@ -16,4 +16,13 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.getenv('EMAIL_USER')
     MAIL_PASSWORD = os.getenv('EMAIL_PASS')
+
+    # Remitente por defecto para correos de la aplicación (ej. reseteo de contraseña)
+    # Flask-Mail usa MAIL_DEFAULT_SENDER si se configura.
+    # Si MAIL_USERNAME está configurado, a menudo se puede usar como MAIL_DEFAULT_SENDER.
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('EMAIL_USER', 'noreply@example.com'))
+
+    # Destinatario para los mensajes del formulario de contacto
+    CONTACT_MAIL_RECIPIENT = os.getenv('CONTACT_MAIL_RECIPIENT', 'admin@example.com')
+
     WTF_CSRF_ENABLED = True
