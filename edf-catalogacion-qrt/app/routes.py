@@ -1,18 +1,23 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint, abort, current_app, make_response, send_file, session
 from flask_login import login_user, current_user, logout_user, login_required
-from app import db, bcrypt, mail
+from app import db, bcrypt, mail # bcrypt aquí es la instancia de Flask-Bcrypt
 from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, ContainerForm, RequestResetForm, ResetPasswordForm, DeleteAccountForm, ContactForm, ChangePasswordForm, UpdateUserForm, SearchContainerForm
 from app.models import User, Container
-from app.main.utils import save_picture, send_reset_email, save_qr_image
+from app.main.utils import save_picture, send_reset_email, save_qr_image, slugify # Añadir slugify a la importación
 from flask_mail import Message
 import qrcode
-import base64
-from io import BytesIO
-from werkzeug.security import generate_password_hash, check_password_hash
+# import base64 # No parece usarse
+# from io import BytesIO # No parece usarse
+# La línea de werkzeug.security ya fue eliminada o comentada en un paso anterior, se confirma que no está.
 from mongoengine.queryset.visitor import Q
 import secrets
 import os
 from PIL import Image
+import re
+import uuid # Importar uuid
+import unicodedata
+
+# slugify, save_picture, save_qr_image movidas a app.main.utils
 
 main = Blueprint('main', __name__)
 
@@ -32,8 +37,8 @@ def register():
         return redirect(url_for('main.welcome'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data) # Usar el método del modelo
         user.save()
         flash('Tu cuenta ha sido creada! Ahora puedes iniciar sesión', 'success')
         return redirect(url_for('main.login'))
@@ -118,7 +123,7 @@ def change_pass(token):
 def send_reset_email(user):
     token = user.get_reset_token()
     msg = Message('Solicitud de restablecimiento de contraseña',
-                  sender='admin@edefrutos.me',
+                  sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@example.com'),
                   recipients=[user.email])
     msg.body = f'''Para restablecer tu contraseña, visita el siguiente enlace:
 {url_for('main.change_pass', token=token, _external=True)}
@@ -131,9 +136,11 @@ Si no solicitaste este cambio, simplemente ignora este mensaje y no se realizar�
 def contacto():
     form = ContactForm()
     if form.validate_on_submit():
-        msg = Message(form.name.data + ' ha enviado un mensaje',
-                      sender='noreply@demo.com',
-                      recipients=['admin@edfdivi.es'])
+        contact_sender_email = form.email.data
+        msg = Message(subject=f"Mensaje de Contacto de: {form.name.data}",
+                      sender=current_app.config.get('MAIL_DEFAULT_SENDER', 'noreply@example.com'),
+                      recipients=[current_app.config.get('CONTACT_MAIL_RECIPIENT', 'admin@example.com')],
+                      reply_to=contact_sender_email)
         msg.body = f'''
         Nombre: {form.name.data}
         Email: {form.email.data}
@@ -166,18 +173,31 @@ def create_container():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
         
-        # Generar el código QR
-        qr_data = f"Contenedor: {form.name.data}\nUbicación: {form.location.data}\nObjetos: {form.items.data}"
-        qr_img = qrcode.make(qr_data)
-        qr_img_path = os.path.join('app', 'static', 'qr_codes', f"{form.name.data}.png")
-        qr_img.save(qr_img_path)
+        picture_file = None
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+
+        container_name = form.name.data
+        container_location = form.location.data
+        container_items_str = form.items.data
+
+        qr_filename = f"{slugify(container_name)}.png"
+        qr_data = f"Contenedor: {container_name}\nUbicación: {container_location}\nObjetos: {container_items_str}"
+
+        # Usar la función save_qr_image actualizada
+        generated_qr_path = save_qr_image(qr_data, qr_filename) # save_qr_image ahora devuelve la ruta o None
+
+        if not generated_qr_path:
+            flash('Error al generar o guardar el código QR.', 'danger')
+            # Decidir si se quiere continuar sin QR o retornar
+            return render_template('create_container.html', title='Crear Contenedor', form=form)
 
         container = Container(
-            name=form.name.data,
-            location=form.location.data,
-            items=form.items.data.split(","),
+            name=container_name,
+            location=container_location,
+            items=container_items_str.split(","),
             image_file=picture_file,
-            qr_image=f"{form.name.data}.png",
+            qr_image=qr_filename, # Guardar solo el nombre del archivo
             user=current_user._get_current_object()
         )
         try:
@@ -219,18 +239,56 @@ def edit_container(container_id):
     if container.user != current_user:
         abort(403)
     form = ContainerForm()
+    original_qr_filename = container.qr_image
+    original_container_name_slug = slugify(container.name) + ".png" if container.name else None
+
     if form.validate_on_submit():
-        container.name = form.name.data
-        container.location = form.location.data
-        container.items = form.items.data.split(',')
+        new_name = form.name.data
+        new_location = form.location.data
+        new_items_str = form.items.data
+
+        name_changed = container.name != new_name
+
+        container.name = new_name
+        container.location = new_location
+        container.items = new_items_str.split(',')
+
         if form.picture.data:
+            # Aquí se podría eliminar la foto de perfil anterior si existe y es diferente
             picture_file = save_picture(form.picture.data)
             container.image_file = picture_file
-        container.save()
+
+        # Manejo del QR
+        new_qr_filename_base = slugify(new_name)
+        new_qr_filename = f"{new_qr_filename_base}.png"
         
-        # Generar y guardar el código QR actualizado
-        data = f"Nombre: {container.name}\nLocalización: {container.location}\nObjetos: {', '.join(container.items)}"
-        save_qr_image(data, container.name)
+        qr_data = f"Contenedor: {new_name}\nLocalización: {new_location}\nObjetos: {new_items_str}"
+
+        # Si el nombre del contenedor cambió, el nombre del archivo QR también debería cambiar.
+        # O si el QR original no existe o tiene un nombre basado en el slug antiguo.
+        if name_changed or not original_qr_filename or original_qr_filename != new_qr_filename:
+            # Eliminar el QR antiguo si existe y el nombre ha cambiado
+            if name_changed and original_qr_filename:
+                old_qr_path = os.path.join(current_app.root_path, 'static', 'qr_codes', original_qr_filename)
+                if os.path.exists(old_qr_path):
+                    try:
+                        os.remove(old_qr_path)
+                        print(f"Eliminado QR antiguo: {old_qr_path}") # Log
+                    except OSError as e:
+                        print(f"Error eliminando QR antiguo {old_qr_path}: {e}") # Log
+
+            generated_qr_path = save_qr_image(qr_data, new_qr_filename) # Guardar nuevo QR
+            if generated_qr_path:
+                container.qr_image = new_qr_filename
+            else:
+                flash('Error al generar o guardar el nuevo código QR.', 'danger')
+        else:
+            # El nombre no cambió, pero otros datos podrían haberlo hecho, así que regeneramos el QR
+            # con el mismo nombre de archivo.
+            save_qr_image(qr_data, original_qr_filename) # Sobrescribe el QR existente
+            container.qr_image = original_qr_filename # Asegurar que sigue siendo el mismo
+
+        container.save()
         flash('Contenedor actualizado con éxito!', 'success')
         return redirect(url_for('main.list_containers'))
     elif request.method == 'GET':
@@ -245,8 +303,24 @@ def delete_container(container_id):
     container = Container.objects(id=container_id).first_or_404()
     if container.user != current_user:
         abort(403)
-    container.delete()
-    flash('Tu contenedor ha sido eliminado!', 'success')
+
+    qr_filename_to_delete = container.qr_image # Guardar antes de borrar el objeto de BD
+
+    container.delete() # Eliminar de la BD
+
+    # Eliminar el archivo QR asociado si existe
+    if qr_filename_to_delete:
+        qr_path_to_delete = os.path.join(current_app.root_path, 'static', 'qr_codes', qr_filename_to_delete)
+        if os.path.exists(qr_path_to_delete):
+            try:
+                os.remove(qr_path_to_delete)
+                print(f"Eliminado archivo QR: {qr_path_to_delete}") # Log
+            except OSError as e:
+                print(f"Error eliminando archivo QR {qr_path_to_delete}: {e}") # Log
+        else:
+            print(f"Archivo QR no encontrado para eliminar: {qr_path_to_delete}") # Log
+
+    flash('Tu contenedor y su código QR asociado han sido eliminados!', 'success')
     return redirect(url_for('main.list_containers'))
 
 @main.route("/print_container/<container_id>")
@@ -265,9 +339,8 @@ def print_container(container_id):
 def change_password():
     form = ChangePasswordForm()
     if form.validate_on_submit():
-        if bcrypt.check_password_hash(current_user.password, form.current_password.data):
-            hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
-            current_user.password = hashed_password
+        if current_user.check_password(form.current_password.data): # Usar el método del modelo
+            current_user.set_password(form.new_password.data) # Usar el método del modelo
             current_user.save()
             flash('Tu contraseña ha sido actualizada!', 'success')
             return redirect(url_for('main.account'))
@@ -308,30 +381,5 @@ def search_container():
 def welcome():
     return render_template('welcome.html')
 
-def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(current_app.root_path, 'static/profile_pics', picture_fn)
-
-    output_size = (800, 800)  # Adjust the resolution as needed
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
-
-    return picture_fn
-
-def save_qr_image(data, container_name):
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=10,  # Make QR code larger
-        border=4,
-    )
-    qr.add_data(data)
-    qr.make(fit=True)
-    img = qr.make_image(fill='black', back_color='white')
-
-    qr_path = os.path.join(current_app.root_path, 'static/qr_codes', container_name + '.png')
-    img.save(qr_path)
-    return qr_path
+# Las funciones save_picture y save_qr_image han sido movidas a app.main.utils
+# y se importan desde allí.

@@ -1,17 +1,12 @@
 from itsdangerous import TimedSerializer as Serializer
 from flask_login import UserMixin
 from flask import current_app
-from mongoengine import Document, StringField, EmailField, ListField, BooleanField, ReferenceField, connect, disconnect
-import bcrypt
-from app import login_manager
+from mongoengine import Document, StringField, EmailField, ListField, BooleanField, ReferenceField
+# La importación 'import bcrypt' se elimina. Usaremos la instancia de app.
+from app import login_manager, bcrypt # Importamos la instancia bcrypt de la app
 
-DB_URI = "mongodb+srv://edfrutos:8TrFzqaQxiXkyxFy@cluster0.i5wdlhj.mongodb.net/app-qr-catalogacion?retryWrites=true&w=majority&appName=Cluster0"
-
-# Desconectar si ya hay una conexión
-disconnect()
-
-# Conectar a la base de datos
-connect(host=DB_URI)
+# DB_URI, disconnect() y connect(host=DB_URI) han sido eliminados.
+# La conexión será manejada por la fábrica de la aplicación.
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -20,17 +15,20 @@ def load_user(user_id):
 class User(Document, UserMixin):
     username = StringField(max_length=50, unique=True, required=True)
     email = StringField(max_length=50, unique=True, required=True)
-    password = StringField(required=True)
+    password = StringField(required=True) # Almacenará el hash generado por Flask-Bcrypt
     image_file = StringField(default='default.jpg')
     address = StringField()
     phone = StringField()
     is_admin = BooleanField(default=False)
     
-    def set_password(self, password):
-        self.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    def set_password(self, password_text):
+        """Genera un hash de la contraseña y lo almacena."""
+        self.password = bcrypt.generate_password_hash(password_text).decode('utf-8')
 
-    def check_password(self, password):
-        return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
+    def check_password(self, password_text):
+        """Verifica la contraseña proporcionada contra el hash almacenado."""
+        # password_text debe ser una cadena. self.password ya es una cadena (el hash).
+        return bcrypt.check_password_hash(self.password, password_text)
     
     @staticmethod
     def verify_reset_token(token, expires_sec=1800):
