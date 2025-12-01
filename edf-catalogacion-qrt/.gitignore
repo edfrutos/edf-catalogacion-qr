@@ -1,0 +1,14 @@
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de entorno
+.env
+venv/
+.venv/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
