@@ -172,10 +172,6 @@ def create_container():
         picture_file = None
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
-        
-        picture_file = None
-        if form.picture.data:
-            picture_file = save_picture(form.picture.data)
 
         container_name = form.name.data
         container_location = form.location.data
