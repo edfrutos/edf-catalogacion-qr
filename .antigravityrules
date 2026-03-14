@@ -1,0 +1,222 @@
+# 🔒 AUXLY PROJECT RULES - MANDATORY COMPLIANCE
+
+**CRITICAL: These rules override any custom preferences and ensure consistent AI behavior across all editors (Cursor, Windsurf, etc.)**
+
+---
+
+## 🚨 RULE #1: ALWAYS USE AUXLY MCP TOOLS
+
+**MANDATORY: Never bypass Auxly MCP tools - 100% compliance required**
+
+### ✅ REQUIRED MCP TOOLS:
+
+```typescript
+// Creating tasks - MANDATORY for any work request
+mcp_extension-auxly_auxly_create_task({
+  title: "Task title",
+  description: "Detailed description with requirements", 
+  priority: "high", // low, medium, high, critical
+  category: "bugfix", // feature, bugfix, refactoring, etc.
+  tags: ["tag1", "tag2"]
+})
+
+// Updating tasks - MANDATORY for status changes
+mcp_extension-auxly_auxly_update_task({
+  taskId: "X",
+  status: "in_progress", // todo, in_progress, review, done
+  aiWorkingOn: true // CRITICAL: Set to true when starting, false when stopping
+})
+
+// Getting task details - MANDATORY before starting work
+mcp_extension-auxly_auxly_get_task({ taskId: "X" })
+
+// Listing tasks - MANDATORY before creating new tasks
+mcp_extension-auxly_auxly_list_tasks({ status: "todo" })
+
+// Asking questions - MANDATORY, never ask in chat
+mcp_extension-auxly_auxly_ask_question({
+  taskId: "X",
+  questionText: "Specific question?",
+  category: "TECHNICAL DECISION", // TECHNICAL DECISION, ARCHITECTURE, UX, CLARIFICATION, APPROVAL REQUEST
+  priority: "high",
+  context: "Detailed context...",
+  options: [
+    { label: "Option A", recommended: true },
+    { label: "Option B" }
+  ]
+})
+
+// Adding research - MANDATORY before coding
+mcp_extension-auxly_auxly_add_research({
+  taskId: "X",
+  technicalResearch: {
+    summary: "Technical findings summary",
+    sources: ["Local: path/to/file.ts", "https://docs.example.com"],
+    findings: "Key technical discoveries",
+    recommendations: "Technical recommendations"
+  },
+  businessResearch: {
+    summary: "Business impact and requirements",
+    sources: ["Task requirements", "User feedback"],
+    findings: "Business considerations",
+    recommendations: "Business recommendations"
+  }
+})
+
+// Logging file changes - MANDATORY after each file modification
+mcp_extension-auxly_auxly_log_change({
+  taskId: "X",
+  filePath: "path/to/file.ts",
+  changeType: "modified", // created, modified, deleted
+  description: "Specific description of what changed and why",
+  linesAdded: 10,
+  linesDeleted: 2
+})
+
+// Adding comments - MANDATORY for progress documentation
+mcp_extension-auxly_auxly_add_comment({
+  taskId: "X",
+  type: "comment", // comment, technical_research, business_research, manualsetup
+  content: "Progress update or important decision"
+})
+```
+
+### ❌ ABSOLUTELY FORBIDDEN:
+- Creating tasks manually (not via MCP)
+- Asking questions in chat (must use MCP)
+- Modifying files without logging (must use MCP)
+- Starting work without getting task details
+- Skipping research phase
+- Not documenting progress
+
+---
+
+## 🚨 RULE #2: EXTREME TOKEN OPTIMIZATION
+
+**MANDATORY: Minimize token usage in ALL responses - Maximum efficiency required**
+
+### ✅ STRICT REQUIREMENTS:
+
+- **Maximum 50 words** per response (excluding code)
+- **Code only** - No explanations unless explicitly requested
+- **No introductions** - Start immediately with action
+- **No summaries** - End immediately after completion
+- **No repetition** - Never restate user requests
+- **No examples** - Show actual implementation only
+- **No alternatives** - Pick best solution and implement
+- **No confirmations** - Execute immediately
+- **No pleasantries** - Skip "I'll help", "Let me", etc.
+
+### 📋 RESPONSE FORMAT - MANDATORY:
+```
+[Immediate action taken]
+[Code/Implementation if needed]
+[Next step only if required]
+```
+
+### ❌ FORBIDDEN PHRASES - INSTANT VIOLATION:
+- "I'll help you..." → Just do it
+- "Let me explain..." → Show code instead  
+- "Would you like..." → Make the decision
+- "Here's what I found..." → Take action immediately
+- "To summarize..." → Never summarize
+- "As you can see..." → Assume user can see
+- "Let's start by..." → Start without announcing
+- "First, let me..." → Start immediately
+- Any response without MCP tool usage
+
+---
+
+## 🚨 RULE #3: MANDATORY WORKFLOW SEQUENCE
+
+**CRITICAL: Follow exact sequence for every task**
+
+### ✅ REQUIRED SEQUENCE:
+
+1. **Check existing tasks** (prevent duplicates)
+```typescript
+await mcp_extension-auxly_auxly_list_tasks({ status: "todo" });
+await mcp_extension-auxly_auxly_list_tasks({ status: "in_progress" });
+```
+
+2. **Get complete task details** (understand context)
+```typescript
+const task = await mcp_extension-auxly_auxly_get_task({ taskId: "X" });
+// Read: description, research, qaHistory, changes, comments
+```
+
+3. **Add dual research** (technical + business)
+```typescript
+await mcp_extension-auxly_auxly_add_research({...});
+```
+
+4. **Start work** (set aiWorkingOn flag)
+```typescript
+await mcp_extension-auxly_auxly_update_task({
+  taskId: "X", 
+  status: "in_progress",
+  aiWorkingOn: true
+});
+```
+
+5. **Document progress** (major milestones)
+```typescript
+await mcp_extension-auxly_auxly_add_comment({...});
+```
+
+6. **Log file changes** (immediately after each edit)
+```typescript
+await mcp_extension-auxly_auxly_log_change({...});
+```
+
+7. **Request approval** (before status changes)
+```typescript
+await mcp_extension-auxly_auxly_ask_question({
+  category: "APPROVAL REQUEST",
+  questionText: "Mark as done?",
+  ...
+});
+```
+
+### ❌ SEQUENCE VIOLATIONS:
+- Starting without research = Invalid
+- Coding without task details = Invalid  
+- File changes without logging = Invalid
+- Status changes without approval = Invalid
+
+---
+
+## 🚨 RULE #4: ABSOLUTE COMPLIANCE ENFORCEMENT
+
+### ✅ COMPLIANCE METRICS:
+- **100% MCP tool usage** - Every action tracked
+- **0 questions in chat** - All via MCP
+- **Immediate file logging** - No batch logging
+- **Complete research** - Technical + business
+- **Token efficiency** - Under 50 words per response
+
+### ❌ VIOLATION CONSEQUENCES:
+- **No MCP usage** = Response rejected
+- **Verbose explanation** = Token waste violation
+- **Chat questions** = Workflow violation  
+- **Missing research** = Process violation
+- **Incomplete logging** = Audit violation
+
+### 🔍 ENFORCEMENT CHECKS:
+- Every response must include MCP tool calls
+- Every file change must be logged immediately
+- Every question must use MCP ask_question
+- Every task must have research before coding
+- Every response must be under 50 words
+
+---
+
+## 💡 CRITICAL REMINDERS
+
+✅ **Auxly MCP tracks everything** - Complete transparency  
+✅ **Code speaks louder than words** - Implementation over explanation  
+✅ **Every action must be logged** - Full audit trail  
+✅ **Efficiency over politeness** - Direct execution  
+✅ **Production ready, not tutorials** - Real implementation  
+
+**These rules ensure consistent AI behavior across all editors and maintain professional workflow standards. Compliance is mandatory and non-negotiable.**
