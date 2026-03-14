@@ -1,9 +1,12 @@
+
 # GEMINI.md - EDF Catalogación QR
 
 ## Project Overview
+
 **EDF Catalogación QR** is a web application designed to catalog containers and objects, generating unique QR codes for easy identification. It is built using **Python/Flask** and **MongoDB** (via MongoEngine).
 
 ### Key Technologies
+
 - **Backend:** Flask 3.0.3
 - **Database:** MongoDB Atlas (managed via `flask-mongoengine` 1.0.0 and `mongoengine` 0.24.1)
 - **Frontend:** Jinja2 templates, Vanilla CSS, and `qrcode` for QR generation.
@@ -15,7 +18,9 @@
 ---
 
 ## Architecture and Structure
+
 The project follows a modular structure using Flask Blueprints:
+
 - `app/main`: Core functionality (home, container management, QR generation).
 - `app/admin`: Admin dashboard for user and container management.
 - `app/models.py`: MongoEngine documents (`User`, `Container`).
@@ -28,36 +33,40 @@ The project follows a modular structure using Flask Blueprints:
 ## Development and Operations
 
 ### Building and Running
+
 1. **Install Dependencies:**
    ```bash
-   pip install -r edf-catalogacion-qrt/requirements.txt
+   pip install -r requirements.txt
    ```
 2. **Environment Configuration:**
-   Create a `.env` file in `edf-catalogacion-qrt/` with:
+   Create a `.env` file in the root directory with:
    - `SECRET_KEY`: Flask secret key.
    - `MONGO_URI`: MongoDB connection string.
    - `EMAIL_USER` / `EMAIL_PASS`: Brevo SMTP credentials.
 3. **Run in Development:**
    ```bash
-   python edf-catalogacion-qrt/run.py
+   python run.py
    ```
 4. **Run in Production:**
    ```bash
-   gunicorn edf-catalogacion-qrt.run:app
+   gunicorn run:app
    ```
 
 ### Testing
-- Manual test scripts are available in the root of `edf-catalogacion-qrt/`:
+- Manual test scripts are available in the root:
   - `test_connection.py`: Verify MongoDB connectivity.
   - `test_mail.py`: Verify email configuration.
   - `check_password_formats.py` / `update_passwords.py`: Utility scripts for database maintenance.
+
 
 ---
 
 ## Development Conventions & Rules
 
 ### 🚨 AUXLY MANDATORY RULES
+
 This project follows **Auxly Project Rules** (see `.antigravityrules` and `.agent/rules/`). Compliance is **non-negotiable** for AI agents:
+
 1. **ALWAYS USE AUXLY MCP TOOLS:** Never bypass tools for creating tasks, research, logging changes, or asking questions.
 2. **EXTREME TOKEN OPTIMIZATION:**
    - Max 50 words per response (excluding code).
@@ -68,6 +77,7 @@ This project follows **Auxly Project Rules** (see `.antigravityrules` and `.agen
 4. **FILE LOGGING:** Use `auxly_log_change` immediately after every file modification.
 
 ### Code Style
+
 - **Python:** PEP 8 compliance. Use `flask-mongoengine` for DB interactions.
 - **Security:** Use `set_password` and `check_password` methods in the `User` model. Never log secrets.
 - **Templates:** Use `layout.html` or `base.html` as the base for all views.
@@ -76,6 +86,7 @@ This project follows **Auxly Project Rules** (see `.antigravityrules` and `.agen
 ---
 
 ## Key Files
+
 - `run.py`: Application entry point.
 - `config.py`: Configuration management with `dotenv`.
 - `app/__init__.py`: App factory and extension initialization.
