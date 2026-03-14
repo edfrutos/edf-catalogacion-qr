@@ -5,6 +5,7 @@ from mongoengine import connect, disconnect
 
 class TestConfig(Config):
     TESTING = True
+    SECRET_KEY = 'test-secret-key' # Necesaria para sesiones en tests
     MONGODB_SETTINGS = {
         'host': 'mongodb://localhost:27017/test_db',
         'is_mock': True  # Usaremos mongomock para las pruebas
@@ -16,12 +17,8 @@ def app():
     # Desconectar cualquier conexión previa de MongoEngine
     disconnect()
     
-    app = create_app()
-    app.config.from_object(TestConfig)
-    
-    # MongoEngine se inicializa con MONGODB_SETTINGS en create_app() -> db.init_app(app)
-    # Sin embargo, para forzar mongomock, a veces es necesario conectarlo explícitamente 
-    # si db.init_app no lo hace automáticamente con el flag is_mock.
+    # Pasamos TestConfig directamente a create_app para que se inicialice db con ella
+    app = create_app(config_class=TestConfig)
     
     with app.app_context():
         yield app
