@@ -1,6 +1,14 @@
 import mongoengine as db
+import os
+from dotenv import load_dotenv
 
-DB_URI = "mongodb+srv://edfrutos:8TrFzqaQxiXkyxFy@cluster0.i5wdlhj.mongodb.net/app-qr-catalogacion?retryWrites=true&w=majority"
+load_dotenv()
+
+DB_URI = os.getenv("MONGO_URI")
+
+if not DB_URI:
+    print("Error: MONGO_URI no está definido en el entorno.")
+    exit(1)
 
 try:
     db.connect(host=DB_URI)
