@@ -1,4 +1,3 @@
-
 # GEMINI.md - EDF Catalogación QR
 
 ## Project Overview
@@ -7,7 +6,7 @@
 
 ### Key Technologies
 
-- **Backend:** Flask 3.0.3
+- **Backend:** Flask 2.1.3 (Downgraded for compatibility)
 - **Database:** MongoDB Atlas (managed via `flask-mongoengine` 1.0.0 and `mongoengine` 0.24.1)
 - **Frontend:** Jinja2 templates, Vanilla CSS, and `qrcode` for QR generation.
 - **Authentication:** `Flask-Login` and `Flask-Bcrypt`.
@@ -35,29 +34,36 @@ The project follows a modular structure using Flask Blueprints:
 ### Building and Running
 
 1. **Install Dependencies:**
+
    ```bash
    pip install -r requirements.txt
    ```
+
 2. **Environment Configuration:**
+
    Create a `.env` file in the root directory with:
    - `SECRET_KEY`: Flask secret key.
    - `MONGO_URI`: MongoDB connection string.
    - `EMAIL_USER` / `EMAIL_PASS`: Brevo SMTP credentials.
+
 3. **Run in Development:**
+
    ```bash
    python run.py
    ```
+
 4. **Run in Production:**
+
    ```bash
    gunicorn run:app
    ```
 
 ### Testing
+
 - Manual test scripts are available in the root:
   - `test_connection.py`: Verify MongoDB connectivity.
   - `test_mail.py`: Verify email configuration.
   - `check_password_formats.py` / `update_passwords.py`: Utility scripts for database maintenance.
-
 
 ---
 
