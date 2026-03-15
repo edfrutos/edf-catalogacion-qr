@@ -7,6 +7,13 @@ import sys
 import getpass
 
 
+def _fail_if_duplicate(exists, message):
+    """Si existe un duplicado, imprime el mensaje y termina con código 1."""
+    if exists:
+        print(message)
+        sys.exit(1)
+
+
 def do_create_admin():
     """
     Crea un usuario administrador solicitando datos por consola.
@@ -33,19 +40,28 @@ def do_create_admin():
     admin_password = getpass.getpass("Introduce contraseña: ").strip()
     if not admin_password:
         admin_password = os.getenv('ADMIN_PASSWORD', 'changeme!')
-        if admin_password == 'changeme!':
-            print("AVISO: Usando contraseña por defecto 'changeme!'.")
+
+    while admin_password == 'changeme!':
+        confirm = input(
+            "Vas a usar la contraseña por defecto 'changeme!'. "
+            "Escribe CONFIRM para continuar: "
+        ).strip()
+        if confirm == 'CONFIRM':
+            break
+        admin_password = getpass.getpass("Introduce contraseña (no vacía): ").strip()
+        if not admin_password:
+            admin_password = os.getenv('ADMIN_PASSWORD', 'changeme!')
 
     app = create_app()
     with app.app_context():
-        # Verificación de duplicados mejorada
-        if User.objects(username=admin_username).first():
-            print(f"\nERROR: El nombre de usuario '{admin_username}' ya existe.")
-            return
-        
-        if User.objects(email=admin_email).first():
-            print(f"\nERROR: El email '{admin_email}' ya está registrado.")
-            return
+        _fail_if_duplicate(
+            User.objects(username=admin_username).first(),
+            f"\nERROR: El nombre de usuario '{admin_username}' ya existe.",
+        )
+        _fail_if_duplicate(
+            User.objects(email=admin_email).first(),
+            f"\nERROR: El email '{admin_email}' ya está registrado.",
+        )
 
         print(f"\nCreando admin '{admin_username}'...")
         user = User(
@@ -59,6 +75,7 @@ def do_create_admin():
             print(f"¡ÉXITO! Usuario '{admin_username}' creado correctamente.")
         except Exception as e:
             print(f"\nERROR inesperado al guardar: {e}")
+            sys.exit(1)
 
 
 if __name__ == '__main__':

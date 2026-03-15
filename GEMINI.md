@@ -12,7 +12,10 @@
 - **Authentication:** `Flask-Login` and `Flask-Bcrypt`.
 - **Forms:** `Flask-WTF` with CSRF protection.
 - **Mailing:** `Flask-Mail` (configured for Brevo SMTP).
-- **Task Management:** **Auxly** (Mandatory MCP-based workflow).
+
+### Workflow
+
+- **Auxly** (MCP-based workflow): Mandatory task management and development process for AI agents. See `.antigravityrules` and `.agent/rules/`.
 
 ---
 
@@ -41,10 +44,16 @@ The project follows a modular structure using Flask Blueprints:
 
 2. **Environment Configuration:**
 
-   Create a `.env` file in the root directory with:
-   - `SECRET_KEY`: Flask secret key.
-   - `MONGO_URI`: MongoDB connection string.
-   - `EMAIL_USER` / `EMAIL_PASS`: Brevo SMTP credentials.
+   Copy `.env.example` to `.env` and fill in your values:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Required variables:
+   - `SECRET_KEY`: Long, random string. Generate with `python -c "import secrets; print(secrets.token_hex(32))"`.
+   - `MONGO_URI`: MongoDB Atlas connection string.
+   - `EMAIL_USER` / `EMAIL_PASS`: Brevo SMTP credentials (login and password for smtp-relay.brevo.com).
 
 3. **Run in Development:**
 
@@ -52,10 +61,20 @@ The project follows a modular structure using Flask Blueprints:
    python run.py
    ```
 
+   Serves at `http://localhost:5000` by default. Set `FLASK_ENV=development` or `FLASK_DEBUG=1` (in `.env` or before running) for development mode and auto-reload.
+
 4. **Run in Production:**
+
+   Simple invocation:
 
    ```bash
    gunicorn run:app
+   ```
+
+   Recommended options: `-w` (workers), `-b` (bind), `--timeout` for long-running requests. Ensure `gunicorn` is in `requirements.txt` (it is). Example:
+
+   ```bash
+   gunicorn -w 4 -b 0.0.0.0:8000 --timeout 120 run:app
    ```
 
 ### Testing

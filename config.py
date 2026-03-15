@@ -7,6 +7,11 @@ load_dotenv()
 class Config:
     # Seguridad
     SECRET_KEY = os.getenv('SECRET_KEY')
+    # TTL de tokens de restablecimiento de contraseña (segundos).
+    # Usado en generación y validación. Default: 1800 (30 min).
+    PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS = int(
+        os.getenv('PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS', '1800')
+    )
     
     # MongoDB Atlas
     MONGO_URI = os.getenv('MONGO_URI')

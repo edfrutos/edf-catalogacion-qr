@@ -31,15 +31,18 @@ class User(Document, UserMixin):
         return bcrypt.check_password_hash(self.password, password_text)
     
     @staticmethod
-    def verify_reset_token(token, expires_sec=1800):
+    def verify_reset_token(token):
+        """Valida un token de restablecimiento de contraseña. TTL: PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS."""
         s = Serializer(current_app.config['SECRET_KEY'])
+        max_age = current_app.config.get('PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS', 1800)
         try:
-            user_id = s.loads(token, max_age=expires_sec)['user_id']
-        except:
+            user_id = s.loads(token, max_age=max_age)['user_id']
+        except Exception:
             return None
         return User.objects(id=user_id).first()
 
-    def get_reset_token(self, expires_sec=1800):
+    def get_reset_token(self):
+        """Genera un token de restablecimiento. TTL: PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS (validación)."""
         s = Serializer(current_app.config['SECRET_KEY'])
         return s.dumps({'user_id': str(self.id)})
 
