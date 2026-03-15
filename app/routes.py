@@ -1,6 +1,6 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint, abort, current_app, make_response, send_file, session
 from flask_login import login_user, current_user, logout_user, login_required
-from app import db, bcrypt, mail # bcrypt aquí es la instancia de Flask-Bcrypt
+from app import db, bcrypt, mail, limiter # bcrypt aquí es la instancia de Flask-Bcrypt
 from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, ContainerForm, RequestResetForm, ResetPasswordForm, DeleteAccountForm, ContactForm, ChangePasswordForm, UpdateUserForm, SearchContainerForm
 from app.models import User, Container
 from app.main.utils import save_picture, send_reset_email, save_qr_image, slugify # Añadir slugify a la importación
@@ -32,6 +32,7 @@ def about():
     return render_template('about.html', title='Acerca de')
 
 @main.route("/register", methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.welcome'))
@@ -45,6 +46,7 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 @main.route("/login", methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
@@ -91,6 +93,7 @@ def account():
     return render_template('account.html', title='Cuenta', image_file=image_file, form=form)
 
 @main.route("/reset_password", methods=['GET', 'POST'])
+@limiter.limit("3 per minute")
 def reset_request():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
@@ -146,8 +149,12 @@ def contacto():
         Email: {form.email.data}
         Mensaje: {form.message.data}
         '''
-        mail.send(msg)
-        flash('Tu mensaje ha sido enviado!', 'success')
+        try:
+            mail.send(msg)
+            flash('Tu mensaje ha sido enviado!', 'success')
+        except Exception as e:
+            current_app.logger.error(f"Error enviando correo: {e}")
+            flash('Lo sentimos, hubo un problema al enviar el mensaje. Inténtalo más tarde.', 'danger')
         return redirect(url_for('main.home'))
     return render_template('contacto.html', title='Contacto', form=form)
 
@@ -196,6 +203,7 @@ def create_container():
             name=container_name,
             location=container_location,
             items=container_items_str.split(","),
+            tags=[tag.strip() for tag in form.tags.data.split(",")] if form.tags.data else [],
             image_file=picture_file,
             qr_image=qr_filename, # Guardar solo el nombre del archivo
             user=current_user._get_current_object()
@@ -222,15 +230,16 @@ def download_container(container_id):
 @main.route("/containers", methods=['GET', 'POST'])
 @login_required
 def list_containers():
+    page = request.args.get('page', 1, type=int)
     form = ContainerForm()
     search_query = request.args.get('search', '')
     if search_query:
         containers = Container.objects(
-            (Q(name__icontains=search_query) | Q(location__icontains=search_query) | Q(items__icontains=search_query)) & Q(user=current_user._get_current_object())
-        )
+            (Q(name__icontains=search_query) | Q(location__icontains=search_query) | Q(items__icontains=search_query) | Q(tags__icontains=search_query)) & Q(user=current_user._get_current_object())
+        ).paginate(page=page, per_page=10)
     else:
-        containers = Container.objects(user=current_user._get_current_object())
-    return render_template('list_containers.html', title='Mis Contenedores', containers=containers, form=form)
+        containers = Container.objects(user=current_user._get_current_object()).paginate(page=page, per_page=10)
+    return render_template('list_containers.html', title='Mis Contenedores', containers=containers, search_query=search_query, form=form)
 
 @main.route("/containers/<container_id>/edit", methods=['GET', 'POST'])
 @login_required
@@ -252,6 +261,7 @@ def edit_container(container_id):
         container.name = new_name
         container.location = new_location
         container.items = new_items_str.split(',')
+        container.tags = [tag.strip() for tag in form.tags.data.split(",")] if form.tags.data else []
 
         if form.picture.data:
             # Aquí se podría eliminar la foto de perfil anterior si existe y es diferente
@@ -295,6 +305,7 @@ def edit_container(container_id):
         form.name.data = container.name
         form.location.data = container.location
         form.items.data = ', '.join(container.items)
+        form.tags.data = ', '.join(container.tags) if container.tags else ''
     return render_template('edit_container.html', title='Editar Contenedor', form=form)
 
 @main.route("/containers/<container_id>/delete", methods=['POST'])
@@ -370,7 +381,7 @@ def search_container():
     search_query = request.args.get('search', '')
     if search_query:
         containers = Container.objects(
-            (Q(name__icontains=search_query) | Q(location__icontains=search_query) | Q(items__icontains=search_query)) & Q(user=current_user._get_current_object())
+            (Q(name__icontains=search_query) | Q(location__icontains=search_query) | Q(items__icontains=search_query) | Q(tags__icontains=search_query)) & Q(user=current_user._get_current_object())
         )
     else:
         containers = Container.objects(user=current_user._get_current_object())

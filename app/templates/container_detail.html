@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-md-8">
             {% if container.image_file %}
-                <img src="{{ url_for('static', filename='images/' ~ container.image_file) }}" class="img-fluid" alt="{{ container.name }}">
+                <img src="{{ url_for('static', filename='profile_pics/' ~ container.image_file) }}" class="img-fluid" alt="{{ container.name }}">
             {% endif %}
             {% if img_str %}
                 <img src="data:image/png;base64,{{ img_str }}" class="img-fluid" alt="QR de {{ container.name }}">
@@ -15,7 +15,13 @@
         <div class="col-md-4">
             <h3>Detalles</h3>
             <p><strong>Ubicación:</strong> {{ container.location }}</p>
-            <p><strong>Descripción:</strong> {{ container.description }}</p>
+            {% if container.tags %}
+                <p><strong>Etiquetas:</strong> 
+                    {% for tag in container.tags %}
+                        <span class="badge badge-info">{{ tag }}</span>
+                    {% endfor %}
+                </p>
+            {% endif %}
             <h3>Elementos</h3>
             <ul>
                 {% for item in container.items %}

@@ -1,49 +1,36 @@
-# Sync .project/sourceTexts/ folder (source text files)
+# Flask/Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+.env
+.env.example # Solo si quieres mantenerlo como plantilla, pero .env debe estar aquí
+build/
+dist/
+*.egg-info/
 
-# Don't sync user-specific SQLite databases
-.project/*.sqlite
+# Tests & Linting
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
-# Don't sync SQLite auxiliary files
-.project/*.sqlite-wal
-.project/*.sqlite-shm
+# Static / User Uploads (No subir imágenes de usuarios ni QRs reales)
+app/static/profile_pics/*
+!app/static/profile_pics/.gitkeep
+app/static/qr_codes/*
+!app/static/qr_codes/.gitkeep
 
-# Don't sync user-specific files
-.project/complete_drafts.txt
-.project/localProjectSettings.json
-.project/localProjectSwap.json
-copilot-messages.log
-
-# Archive formats
-*.zip
-*.rar
-*.7z
-*.tar
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.gz
-*.bz2
-*.xz
-
-# Windows executables and installers
-*.exe
-*.msi
-*.bat
-*.cmd
-*.com
-*.scr
-*.dll
-
-# macOS executables and disk images
-*.dmg
-*.pkg
-
-# Disk images and virtual machine files
-*.iso
-*.img
-*.vhd
-*.vmdk
-
-# System files
+# OS / IDE
 .DS_Store
-.project/attachments/files/**
+.vscode/
+.idea/
+.project/
+.qodo/
+*.swp
+*.log
+
+# Project specific
+files/*.json
+copilot-messages.log

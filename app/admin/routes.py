@@ -19,7 +19,8 @@ def admin_required(func):
 @admin.route('/users')
 @admin_required
 def list_users():
-    users = User.objects.all()
+    page = request.args.get('page', 1, type=int)
+    users = User.objects.paginate(page=page, per_page=10)
     return render_template('admin/admin_users.html', title='List Users', users=users)
 
 @admin.route('/user/<user_id>/edit', methods=['GET', 'POST'])
@@ -51,11 +52,20 @@ def view_user(user_id):
 @admin.route('/containers', methods=['GET', 'POST'])
 @admin_required
 def admin_search_containers():
+    page = request.args.get('page', 1, type=int)
     form = SearchContainerForm()
-    containers = []
+    containers = None
+    search_query = request.args.get('search_query', '')
+    
     if form.validate_on_submit():
         search_query = form.search_query.data
+        return redirect(url_for('admin.admin_search_containers', search_query=search_query))
+    
+    if search_query:
         containers = Container.objects(
             Q(name__icontains=search_query) | Q(location__icontains=search_query) | Q(items__icontains=search_query)
-        )
-    return render_template('admin/admin_search_containers.html', title='Search Containers', form=form, containers=containers)
+        ).paginate(page=page, per_page=10)
+    else:
+        containers = Container.objects.paginate(page=page, per_page=10)
+        
+    return render_template('admin/admin_search_containers.html', title='Search Containers', form=form, containers=containers, search_query=search_query)

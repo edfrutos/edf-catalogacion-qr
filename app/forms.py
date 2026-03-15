@@ -72,6 +72,7 @@ class ContainerForm(FlaskForm):
     name = StringField('Nombre del Contenedor', validators=[DataRequired(), Length(min=2, max=50)])
     location = StringField('Ubicación', validators=[DataRequired(), Length(min=2, max=100)])
     items = TextAreaField('Objetos (separados por comas)', validators=[DataRequired()])
+    tags = StringField('Etiquetas (separadas por comas)', validators=[Length(max=100)]) # Nuevo campo
     picture = FileField('Imagen del Objeto', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Guardar')
 

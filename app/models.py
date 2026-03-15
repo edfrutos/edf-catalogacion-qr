@@ -1,25 +1,20 @@
 from itsdangerous import TimedSerializer as Serializer
 from flask_login import UserMixin
 from flask import current_app
-from mongoengine import Document, StringField, EmailField, ListField, BooleanField, ReferenceField
-# La importación 'import bcrypt' se elimina. Usaremos la instancia de app.
-from app import login_manager, bcrypt # Importamos la instancia bcrypt de la app
-
-# DB_URI, disconnect() y connect(host=DB_URI) han sido eliminados.
-# La conexión será manejada por la fábrica de la aplicación.
+from app import db, login_manager, bcrypt
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.objects(id=user_id).first()
 
-class User(Document, UserMixin):
-    username = StringField(max_length=50, unique=True, required=True)
-    email = StringField(max_length=50, unique=True, required=True)
-    password = StringField(required=True) # Almacenará el hash generado por Flask-Bcrypt
-    image_file = StringField(default='default.jpg')
-    address = StringField()
-    phone = StringField()
-    is_admin = BooleanField(default=False)
+class User(db.Document, UserMixin):
+    username = db.StringField(max_length=50, unique=True, required=True)
+    email = db.EmailField(max_length=50, unique=True, required=True)
+    password = db.StringField(required=True)
+    image_file = db.StringField(default='default.jpg')
+    address = db.StringField()
+    phone = db.StringField()
+    is_admin = db.BooleanField(default=False)
     
     def set_password(self, password_text):
         """Genera un hash de la contraseña y lo almacena."""
@@ -27,12 +22,11 @@ class User(Document, UserMixin):
 
     def check_password(self, password_text):
         """Verifica la contraseña proporcionada contra el hash almacenado."""
-        # password_text debe ser una cadena. self.password ya es una cadena (el hash).
         return bcrypt.check_password_hash(self.password, password_text)
     
     @staticmethod
     def verify_reset_token(token):
-        """Valida un token de restablecimiento de contraseña. TTL: PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS."""
+        """Valida un token de restablecimiento de contraseña."""
         s = Serializer(current_app.config['SECRET_KEY'])
         max_age = current_app.config.get('PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS', 1800)
         try:
@@ -42,17 +36,18 @@ class User(Document, UserMixin):
         return User.objects(id=user_id).first()
 
     def get_reset_token(self):
-        """Genera un token de restablecimiento. TTL: PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS (validación)."""
+        """Genera un token de restablecimiento."""
         s = Serializer(current_app.config['SECRET_KEY'])
         return s.dumps({'user_id': str(self.id)})
 
-class Container(Document):
-    name = StringField(required=True, unique=True)
-    location = StringField(required=True)
-    items = ListField(StringField(), required=True)
-    image_file = StringField()
-    user = ReferenceField(User, required=True)
-    qr_image = StringField()
+class Container(db.Document):
+    name = db.StringField(required=True, unique=True)
+    location = db.StringField(required=True)
+    items = db.ListField(db.StringField(), required=True)
+    tags = db.ListField(db.StringField())
+    image_file = db.StringField()
+    user = db.ReferenceField(User, required=True)
+    qr_image = db.StringField()
 
     def __repr__(self):
         return f"Container('{self.name}', '{self.location}')"

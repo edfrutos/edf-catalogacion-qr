@@ -27,30 +27,33 @@ def do_create_admin():
     from app.models import User
 
     print("\n--- Configuración de Usuario Administrador ---")
-    
+
     # Solicitar Username
-    env_user = os.getenv('ADMIN_USERNAME', 'admin')
-    admin_username = input(f"Introduce nombre de usuario [{env_user}]: ").strip() or env_user
-    
+    env_user = os.getenv("ADMIN_USERNAME", "admin")
+    admin_username = (
+        input(f"Introduce nombre de usuario [{env_user}]: ").strip() or env_user
+    )
+
     # Solicitar Email
-    env_email = os.getenv('ADMIN_EMAIL', 'admin@example.com')
+    env_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
     admin_email = input(f"Introduce email [{env_email}]: ").strip() or env_email
-    
+
     # Solicitar Password de forma segura
     admin_password = getpass.getpass("Introduce contraseña: ").strip()
     if not admin_password:
-        admin_password = os.getenv('ADMIN_PASSWORD', 'changeme!')
+        admin_password = os.getenv("ADMIN_PASSWORD", "changeme!")
 
-    while admin_password == 'changeme!':
+    while admin_password == "changeme!":
         confirm = input(
             "Vas a usar la contraseña por defecto 'changeme!'. "
             "Escribe CONFIRM para continuar: "
         ).strip()
-        if confirm == 'CONFIRM':
+        if confirm == "CONFIRM":
             break
+        # sourcery skip: extract-method, use-or-for-fallback
         admin_password = getpass.getpass("Introduce contraseña (no vacía): ").strip()
         if not admin_password:
-            admin_password = os.getenv('ADMIN_PASSWORD', 'changeme!')
+            admin_password = os.getenv("ADMIN_PASSWORD", "changeme!")
 
     app = create_app()
     with app.app_context():
@@ -64,11 +67,7 @@ def do_create_admin():
         )
 
         print(f"\nCreando admin '{admin_username}'...")
-        user = User(
-            username=admin_username,
-            email=admin_email,
-            is_admin=True
-        )
+        user = User(username=admin_username, email=admin_email, is_admin=True)
         user.set_password(admin_password)
         try:
             user.save()
@@ -78,7 +77,7 @@ def do_create_admin():
             sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         do_create_admin()
     except KeyboardInterrupt:

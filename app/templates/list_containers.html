@@ -12,27 +12,50 @@
             </div>
         </form>
         <div class="list-group">
-            {% if containers %}
-                {% for container in containers %}
+            {% if containers.items %}
+                {% for container in containers.items %}
                 <div class="list-group-item">
                     <h4>{{ container.name }}</h4>
-                    <p>{{ container.location }}</p>
+                    <p><strong>Ubicación:</strong> {{ container.location }}</p>
+                    {% if container.tags %}
+                        <p><strong>Etiquetas:</strong> 
+                            {% for tag in container.tags %}
+                                <span class="badge badge-info">{{ tag }}</span>
+                            {% endfor %}
+                        </p>
+                    {% endif %}
                     <a href="{{ url_for('main.container_detail', container_id=container.id) }}" class="btn btn-primary">Ver Detalles</a>
                     <a href="{{ url_for('main.edit_container', container_id=container.id) }}" class="btn btn-secondary">Editar</a>
                     <a href="{{ url_for('main.print_container', container_id=container.id) }}" class="btn btn-info">Imprimir</a>
                     <a href="{{ url_for('main.download_container', container_id=container.id) }}" class="btn btn-success">Descargar</a>
                     <form action="{{ url_for('main.delete_container', container_id=container.id) }}" method="POST" style="display: inline;">
-                        {{ form.hidden_tag() }}
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este contenedor?');">Eliminar</button>
                     </form>
                 </div>
                 {% endfor %}
             {% else %}
                 <div class="list-group-item">
-                    <h4>No tienes contenedores registrados.</h4>
+                    <h4>No se encontraron contenedores.</h4>
                 </div>
             {% endif %}
         </div>
+
+        <!-- Paginación -->
+        <div class="mt-4 text-center">
+            {% for page_num in containers.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                    {% if containers.page == page_num %}
+                        <a class="btn btn-primary mb-4" href="{{ url_for('main.list_containers', page=page_num, search=search_query) }}">{{ page_num }}</a>
+                    {% else %}
+                        <a class="btn btn-outline-primary mb-4" href="{{ url_for('main.list_containers', page=page_num, search=search_query) }}">{{ page_num }}</a>
+                    {% endif %}
+                {% else %}
+                    ...
+                {% endif %}
+            {% endfor %}
+        </div>
+
     </div>
     {% endblock %}
 </body>

@@ -4,6 +4,8 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_wtf import CSRFProtect
 from flask_mongoengine import MongoEngine
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 # from mongoengine import connect, disconnect # No longer needed here
 from config import Config
 import os
@@ -19,13 +21,18 @@ login_manager.login_view = 'main.login'
 login_manager.login_message_category = 'info'
 mail = Mail()
 csrf = CSRFProtect()
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://",
+)
 
 def create_app(config_class=Config):
     app = Flask(__name__)
-    # Cargar configuración desde Config object. Esto incluye MONGODB_SETTINGS.
+    # Cargar configuración desde el objeto proporcionado (Config por defecto)
     app.config.from_object(config_class)
 
-    # Solo aplicar configuración TLS si hay un host definido y no estamos en modo mock/testing con mongomock
+    # Solo aplicar configuración TLS si hay un host definido y no estamos en modo mock/testing
     if app.config.get('MONGODB_SETTINGS') and app.config['MONGODB_SETTINGS'].get('host'):
         if not app.config['MONGODB_SETTINGS'].get('is_mock'):
             app.config['MONGODB_SETTINGS'].update({
@@ -34,21 +41,16 @@ def create_app(config_class=Config):
                 'ssl_cert_reqs': ssl.CERT_REQUIRED,
             })
 
-    # Asegurar otras configuraciones que podrían no estar en Config object
-    app.config.setdefault('SECRET_KEY', os.getenv('SECRET_KEY', 'a_very_secure_default_secret_key_CHANGE_ME'))
-    app.config.setdefault('MAIL_SERVER', os.getenv('MAIL_SERVER', 'smtp.example.com'))
-    app.config.setdefault('MAIL_PORT', int(os.getenv('MAIL_PORT', 587)))
-    app.config.setdefault('MAIL_USE_TLS', os.getenv('MAIL_USE_TLS', 'True').lower() in ['true', '1', 't'])
-    app.config.setdefault('MAIL_USERNAME', os.getenv('EMAIL_USER'))
-    app.config.setdefault('MAIL_PASSWORD', os.getenv('EMAIL_PASS'))
-    app.config.setdefault('WTF_CSRF_ENABLED', True)
+    # Asegurar que SECRET_KEY tenga un valor si no viene del objeto config
+    if not app.config.get('SECRET_KEY'):
+        app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'a_very_secure_default_secret_key_CHANGE_ME')
 
-
-    db.init_app(app) # MongoEngine se inicializa aquí usando app.config['MONGODB_SETTINGS']
+    db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
+    limiter.init_app(app)
 
     # Las llamadas explícitas a disconnect() y connect() han sido eliminadas.
     # db.init_app(app) maneja la conexión.

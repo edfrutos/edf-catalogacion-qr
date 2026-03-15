@@ -18,6 +18,10 @@
             {{ form.items(class="form-control") }}
         </div>
         <div class="form-group">
+            {{ form.tags.label(class="form-control-label") }}
+            {{ form.tags(class="form-control", placeholder="ej: herramientas, cocina, navidad") }}
+        </div>
+        <div class="form-group">
             {{ form.picture.label(class="form-control-label") }}
             {{ form.picture(class="form-control-file") }}
         </div>
