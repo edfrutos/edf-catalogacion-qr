@@ -437,7 +437,7 @@ def register():
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
         user.save()
-        flash("Creado!", "success")
+        flash("Tu cuenta ha sido creada. Ya puedes iniciar sesión.", "success")
         return redirect(url_for("main.login"))
     return render_template("register.html", form=form)
 
