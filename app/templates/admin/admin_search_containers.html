@@ -2,48 +2,83 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Buscar Contenedores</h2>
-    <form method="POST" action="{{ url_for('admin.admin_search_containers') }}">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.search_query.label(class="form-control-label") }}
-            {{ form.search_query(class="form-control") }}
+    <div class="card shadow mb-4">
+        <div class="card-header bg-dark text-white">
+            <h2 class="mb-0">Gestión Global de Contenedores</h2>
         </div>
-        <button type="submit" class="btn btn-primary">Buscar</button>
-    </form>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin.admin_search_containers') }}" class="form-inline mb-4">
+                {{ form.hidden_tag() }}
+                <div class="input-group w-100">
+                    {{ form.search_query(class="form-control", placeholder="Buscar por nombre, ubicación u objetos...") }}
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </form>
 
-    <h2 class="mt-4">Resultados de la Búsqueda</h2>
-    <ul class="list-group">
-        {% if containers.items %}
-            {% for container in containers.items %}
-            <li class="list-group-item">
-                <h5>{{ container.name }}</h5>
-                <p>Ubicación: {{ container.location }}</p>
-                <p>Objetos: {{ container.items | join(', ') }}</p>
-                <p>Usuario: {{ container.user.username }}</p>
-            </li>
-            {% endfor %}
-        {% else %}
-            <li class="list-group-item">
-                <p>No se encontraron contenedores.</p>
-            </li>
-        {% endif %}
-    </ul>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Contenedor</th>
+                            <th>Ubicación</th>
+                            <th>Usuario Propietario</th>
+                            <th>Objetos</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if containers.items %}
+                            {% for container in containers.items %}
+                            <tr>
+                                <td><strong>{{ container.name }}</strong></td>
+                                <td>{{ container.location }}</td>
+                                <td>
+                                    <span class="badge badge-secondary">{{ container.user.username }}</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ container.items | join(', ') | truncate(50) }}</small>
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('main.container_detail', container_id=container.id) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No se encontraron contenedores.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
 
-    <!-- Paginación -->
-    <div class="mt-4 text-center">
-        {% for page_num in containers.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-            {% if page_num %}
-                {% if containers.page == page_num %}
-                    <a class="btn btn-primary mb-4" href="{{ url_for('admin.admin_search_containers', page=page_num, search_query=search_query) }}">{{ page_num }}</a>
-                {% else %}
-                    <a class="btn btn-outline-primary mb-4" href="{{ url_for('admin.admin_search_containers', page=page_num, search_query=search_query) }}">{{ page_num }}</a>
-                {% endif %}
-            {% else %}
-                ...
+            <!-- Paginación -->
+            {% if containers.pages > 1 %}
+            <nav aria-label="Navegación de contenedores" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% for page_num in containers.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            {% if containers.page == page_num %}
+                                <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.admin_search_containers', page=page_num, search_query=search_query) }}">{{ page_num }}</a>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </nav>
             {% endif %}
-        {% endfor %}
+        </div>
     </div>
-
 </div>
 {% endblock %}
