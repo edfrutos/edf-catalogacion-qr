@@ -8,6 +8,7 @@ def load_user(user_id):
     return User.objects(id=user_id).first()
 
 class User(db.Document, UserMixin):
+    meta = {'collection': 'user', 'strict': False}  # Ignora campos extra (updatedAt, emailVerified, etc.)
     username = db.StringField(max_length=50, unique=True, required=True)
     email = db.EmailField(max_length=50, unique=True, required=True)
     password = db.StringField(required=True)

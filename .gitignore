@@ -5,7 +5,6 @@ __pycache__/
 .venv/
 env/
 .env
-.env.example # Solo si quieres mantenerlo como plantilla, pero .env debe estar aquí
 build/
 dist/
 *.egg-info/
@@ -30,6 +29,9 @@ app/static/qr_codes/*
 .qodo/
 *.swp
 *.log
+
+# Node (Better-Auth)
+auth/node_modules/
 
 # Project specific
 files/*.json

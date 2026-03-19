@@ -12,7 +12,8 @@ Este cuaderno sirve para priorizar y monitorizar la implementación de las mejor
 - [x] **Pruebas Automatizadas (pytest):** Crear suite de tests unitarios e integración. (Completado 2026-03-14)
 - [x] **Seguridad de Configuración:** Migración de secretos a `.env` y actualización de `.gitignore`. (Completado 2026-03-14)
 - [x] **Gestión Segura de Admin:** Script `create_admin.py` ahora es interactivo y seguro. (Completado 2026-03-14)
-- [x] **Rate Limiting (Flask-Limiter):** Protección contra fuerza bruta en login y reset de contraseña. (Completado 2026-03-14)
+- [ ] **Rate Limiting (Flask-Limiter):** Protección contra fuerza bruta en login y reset de contraseña. (Completado 2026-03-14)
+- [x] **Integración Better-Auth (OAuth):** Login con Google y GitHub vía Better-Auth. (Completado 2026-03-19)
 - [ ] **Auditoría de Dependencias:** Actualizar `Pillow` y otras librerías críticas (`pip-audit`).
 - [ ] **Logs de Error Estructurados:** Implementar un logger formal para depuración en producción.
 
@@ -31,6 +32,7 @@ Este cuaderno sirve para priorizar y monitorizar la implementación de las mejor
 ---
 
 ## 📝 Historial de Implementación
+*   **2026-03-19:** Sistema de login unificado: usuario/contraseña (colección `user`, bcrypt/scrypt/pbkdf2) + OAuth (Google/GitHub con Better-Auth). Config MongoDB: `MONGODB_DB`, `MONGO_TLS_ALLOW_INVALID_CERTS`. Modelo User con `strict=False` para compatibilidad con documentos mixtos.
 *   **2026-03-14:** Script de creación de admin convertido a interactivo con validaciones de seguridad.
 *   **2026-03-14:** Corrección de fallos en GitHub Actions CI (inyección de config y downgrade de Flask para compatibilidad).
 *   **2026-03-14:** Reestructuración de la raíz del proyecto, profesionalización del repositorio (CI, Licencia, Guías) y aseguramiento de variables de entorno (.env).

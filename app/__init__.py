@@ -35,16 +35,20 @@ def create_app(config_class=Config):
     # Solo aplicar configuración TLS si hay un host definido y no estamos en modo mock/testing
     if app.config.get('MONGODB_SETTINGS') and app.config['MONGODB_SETTINGS'].get('host'):
         if not app.config['MONGODB_SETTINGS'].get('is_mock'):
+            allow_invalid = os.getenv('MONGO_TLS_ALLOW_INVALID_CERTS', '').lower() in ('1', 'true', 'yes')
             app.config['MONGODB_SETTINGS'].update({
                 'tls': True,
-                'tlsAllowInvalidCertificates': False,
-                'ssl_cert_reqs': ssl.CERT_REQUIRED,
+                'tlsAllowInvalidCertificates': allow_invalid,
+                'ssl_cert_reqs': ssl.CERT_NONE if allow_invalid else ssl.CERT_REQUIRED,
             })
 
     # Asegurar que SECRET_KEY tenga un valor si no viene del objeto config
     if not app.config.get('SECRET_KEY'):
         app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'a_very_secure_default_secret_key_CHANGE_ME')
 
+    host = (app.config['MONGODB_SETTINGS'].get('host') or '')[:50]
+    db_name = app.config['MONGODB_SETTINGS'].get('db', 'NO DEFINIDA')
+    print(f"[DEBUG] Inicializando MongoEngine. Host: {host}... BD Target: {db_name}")
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)

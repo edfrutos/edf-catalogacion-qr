@@ -1,41 +1,37 @@
 import os
+import re
 from dotenv import load_dotenv
 
-# Cargar variables de entorno desde el archivo .env
 load_dotenv()
 
+
 class Config:
-    # Seguridad
     SECRET_KEY = os.getenv('SECRET_KEY')
-    # TTL de tokens de restablecimiento de contraseña (segundos).
-    # Usado en generación y validación. Default: 1800 (30 min).
-    PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS = int(
-        os.getenv('PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS', '1800')
-    )
-    
-    # MongoDB Atlas
     MONGO_URI = os.getenv('MONGO_URI')
+    
+    # Base de datos: usa MONGODB_DB del .env o la que venga en MONGO_URI
+    _db = os.getenv('MONGODB_DB')
+    if not _db and MONGO_URI:
+        # Extraer db de la URI si existe (mongodb+srv://.../nombre_db?params)
+        m = re.search(r'mongodb(?:\+srv)?://[^/]+/([^?]+)', MONGO_URI)
+        _db = m.group(1) if m else 'test'
     MONGODB_SETTINGS = {
-        'host': MONGO_URI
+        'host': MONGO_URI,
+        'db': _db or 'test',
+        'connect': False,
     }
     
-    # Configuración de Correo (Flask-Mail)
-    MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp-relay.brevo.com')
-    MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
-    MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'True').lower() in ['true', '1', 't']
+    MAIL_SERVER = 'smtp-relay.brevo.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
     MAIL_USERNAME = os.getenv('EMAIL_USER')
     MAIL_PASSWORD = os.getenv('EMAIL_PASS')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
-
-    # Otros correos
     CONTACT_MAIL_RECIPIENT = os.getenv('CONTACT_MAIL_RECIPIENT')
-
-    # WTF Forms
+    
     WTF_CSRF_ENABLED = True
-
-    # AWS S3 (Para futura implementación)
-    AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-    AWS_REGION = os.getenv('AWS_REGION')
-    S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
-    USE_S3 = os.getenv('USE_S3', 'False').lower() in ['true', '1', 't']
+    PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS = 1800
+    BETTER_AUTH_URL = os.getenv('BETTER_AUTH_URL', 'http://localhost:3000')
+    # Sesión: cookies en localhost
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_HTTPONLY = True

@@ -23,10 +23,10 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Ese email ya está en uso. Por favor, elige otro.')
 
 class LoginForm(FlaskForm):
-    email_or_username = StringField('Email or Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me')
-    submit = SubmitField('Login')
+    email_or_username = StringField('Usuario o Email', validators=[DataRequired()])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
+    remember = BooleanField('Recordarme')
+    submit = SubmitField('Entrar')
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Nombre de Usuario', validators=[DataRequired(), Length(min=2, max=20)])

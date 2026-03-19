@@ -9,7 +9,7 @@
 - **Backend:** Flask 2.1.3 (Downgraded for compatibility)
 - **Database:** MongoDB Atlas (managed via `flask-mongoengine` 1.0.0 and `mongoengine` 0.24.1)
 - **Frontend:** Jinja2 templates, Vanilla CSS, and `qrcode` for QR generation.
-- **Authentication:** `Flask-Login` and `Flask-Bcrypt`.
+- **Authentication:** `Flask-Login`, `Flask-Bcrypt`, y **Better-Auth** (OAuth con Google/GitHub). Login dual: usuario/contraseña (colección `user`) y OAuth.
 - **Forms:** `Flask-WTF` with CSRF protection.
 - **Mailing:** `Flask-Mail` (configured for Brevo SMTP).
 
@@ -53,15 +53,26 @@ The project follows a modular structure using Flask Blueprints:
    Required variables:
    - `SECRET_KEY`: Long, random string. Generate with `python -c "import secrets; print(secrets.token_hex(32))"`.
    - `MONGO_URI`: MongoDB Atlas connection string.
+   - `MONGODB_DB`: Base de datos (ej. `test`). Opcional si la URI incluye el nombre.
+   - `MONGO_TLS_ALLOW_INVALID_CERTS`: `true` en desarrollo (macOS) si falla la verificación SSL.
    - `EMAIL_USER` / `EMAIL_PASS`: Brevo SMTP credentials (login and password for smtp-relay.brevo.com).
+   - `BETTER_AUTH_URL`: URL del servidor auth (ej. `http://localhost:3000`).
 
 3. **Run in Development:**
 
+   **Opción A – Todo junto (recomendado):**
    ```bash
-   python run.py
+   honcho start -e .env -f Procfile.app
+   ```
+   Arranca Flask (5020) y auth (3000). Honcho carga `.env` automáticamente.
+
+   **Opción B – Por separado:**
+   ```bash
+   python run.py          # Flask en 5020
+   node auth/index.js     # Auth en 3000 (otra terminal)
    ```
 
-   Serves at `http://localhost:5000` by default. Set `FLASK_ENV=development` or `FLASK_DEBUG=1` (in `.env` or before running) for development mode and auto-reload.
+   Accede siempre por `http://localhost:5020` (no 0.0.0.0) para que las cookies de sesión funcionen.
 
 4. **Run in Production:**
 
@@ -105,6 +116,7 @@ This project follows **Auxly Project Rules** (see `.antigravityrules` and `.agen
 
 - **Python:** PEP 8 compliance. Use `flask-mongoengine` for DB interactions.
 - **Security:** Use `set_password` and `check_password` methods in the `User` model. Never log secrets.
+- **Login:** Usuario/contraseña en colección `user` (bcrypt, scrypt, pbkdf2). OAuth vía Better-Auth. Script `diagnostico_uri.py` para depurar conexión MongoDB.
 - **Templates:** Use `layout.html` or `base.html` as the base for all views.
 - **QR Codes:** Saved in `app/static/qr_codes/` using slugified container names.
 

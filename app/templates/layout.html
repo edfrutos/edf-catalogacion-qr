@@ -79,13 +79,10 @@
                 </li>
                 {% if current_user.is_admin %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admin</a>
-                    <div class="dropdown-menu" aria-labelledby="adminDropdown">
-                        <a class="dropdown-item" href="{{ url_for('admin.admin_search_containers') }}">Buscar Contenedores</a>
-                        <a class="dropdown-item" href="{{ url_for('admin.edit_user', user_id=current_user.id) }}">Editar Usuario</a>
-                        <a class="dropdown-item" href="{{ url_for('admin.list_users') }}">Listar Usuarios</a>
-                        <a class="dropdown-item" href="{{ url_for('admin.edit_user', user_id=current_user.id) }}">View User</a>
-                        <a class="dropdown-item" href="{{ url_for('admin.admin_search_containers') }}">Contenedores</a>
+                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Administración</a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="adminDropdown">
+                        <a class="dropdown-item" href="{{ url_for('admin.list_users') }}"><i class="fas fa-users"></i> Gestionar Usuarios</a>
+                        <a class="dropdown-item" href="{{ url_for('admin.admin_search_containers') }}"><i class="fas fa-boxes"></i> Gestionar Contenedores</a>
                     </div>
                 </li>
                 {% endif %}
