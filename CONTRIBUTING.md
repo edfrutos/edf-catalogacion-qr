@@ -15,7 +15,7 @@ Thank you for your interest in contributing! Here are some guidelines to help yo
 
 ## Development Setup
 
-See `GEMINI.md` or `edf-catalogacion-qrt/Instalacio.md` for detailed instructions on setting up the development environment.
+See `GEMINI.md` or `Instalacio.md` for detailed instructions on setting up the development environment.
 
 ## Coding Standards
 

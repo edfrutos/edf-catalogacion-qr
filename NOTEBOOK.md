@@ -25,6 +25,8 @@ Este cuaderno sirve para priorizar y monitorizar la implementación de las mejor
 - [ ] **Contenedores Compartidos:** Permitir acceso multiusuario a contenedores específicos.
 
 ## 🎨 4. UX y Frontend
+- [x] **Búsqueda Admin Contenedores (GET + paginación):** Formulario de búsqueda usa GET para URLs compartibles y paginación correcta. (Completado 2026-03-15)
+- [x] **Accesibilidad (ARIA):** Labels y atributos ARIA en formularios admin (búsqueda, edición de usuario). Protección ante `container.user` nulo. (Completado 2026-03-15)
 - [ ] **Notificaciones Toast (JS):** Mejorar la UI de los mensajes flash.
 - [ ] **PWA (Progressive Web App):** Hacer la aplicación instalable en dispositivos móviles.
 - [ ] **Búsqueda Dinámica (Fetch API):** Filtrado de contenedores en tiempo real sin recarga.
@@ -32,6 +34,7 @@ Este cuaderno sirve para priorizar y monitorizar la implementación de las mejor
 ---
 
 ## 📝 Historial de Implementación
+*   **2026-03-15:** Búsqueda admin contenedores: formulario POST→GET; `search_query` en URL; paginación conserva filtro; `SearchContainerForm` con `Optional()`. Tokens de reset: `URLSafeTimedSerializer`. Scripts `debug_db.py` y `reset_user.py` endurecidos (PII enmascarado, contraseña no hardcodeada). Accesibilidad: ARIA en inputs admin, contenedores sin usuario.
 *   **2026-03-19:** Sistema de login unificado: usuario/contraseña (colección `user`, bcrypt/scrypt/pbkdf2) + OAuth (Google/GitHub con Better-Auth). Config MongoDB: `MONGODB_DB`, `MONGO_TLS_ALLOW_INVALID_CERTS`. Modelo User con `strict=False` para compatibilidad con documentos mixtos.
 *   **2026-03-14:** Script de creación de admin convertido a interactivo con validaciones de seguridad.
 *   **2026-03-14:** Corrección de fallos en GitHub Actions CI (inyección de config y downgrade de Flask para compatibilidad).

@@ -28,7 +28,7 @@ The project follows a modular structure using Flask Blueprints:
 - `app/models.py`: MongoEngine documents (`User`, `Container`).
 - `app/forms.py`: WTForms definitions.
 - `app/static/`: CSS, profile pictures, and generated QR codes.
-- `app/templates/`: Jinja2 templates organized by module.
+- `app/templates/`: Jinja2 templates organized by module. Admin search uses GET forms for shareable URLs and pagination.
 
 ---
 
@@ -129,5 +129,5 @@ This project follows **Auxly Project Rules** (see `.antigravityrules` and `.agen
 - `app/__init__.py`: App factory and extension initialization.
 - `app/models.py`: Data models.
 - `app/routes.py`: Main application logic.
-- `app/admin/routes.py`: Admin-specific logic.
+- `app/admin/routes.py`: Admin-specific logic. Admin search containers: GET-only, `search_query` from `request.args`; pagination links preserve filter.
 - `.antigravityrules`: Critical Auxly enforcement rules.
