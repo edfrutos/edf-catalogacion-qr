@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 from flask_wtf.file import FileAllowed
 from app.models import User
 from flask_login import current_user
@@ -87,7 +87,7 @@ class ContactForm(FlaskForm):
     submit = SubmitField('Enviar')
 
 class SearchContainerForm(FlaskForm):
-    search_query = StringField('Buscar', validators=[DataRequired()])
+    search_query = StringField('Buscar', validators=[Optional()])
     submit = SubmitField('Buscar')
 
 class UpdateUserForm(FlaskForm):

@@ -1,4 +1,4 @@
-from itsdangerous import TimedSerializer as Serializer
+from itsdangerous import URLSafeTimedSerializer as Serializer
 from flask import current_app
 from app.models import User
 

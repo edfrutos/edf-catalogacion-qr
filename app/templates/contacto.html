@@ -1,24 +1,29 @@
 {% extends "layout.html" %}
 {% block content %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <div class="container">
-        <h2>Contacto</h2>
-        <form method="POST">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.name.label }}
-                {{ form.name(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.email.label }}
-                {{ form.email(class="form-control") }}
-            </div>
-            <div class="form-group">
-                {{ form.message.label }}
-                {{ form.message(class="form-control") }}
-            </div>
-            <button type="submit" class="btn btn-primary">Enviar</button>
-        </form>
+<div class="auth-card">
+    <div class="card card-app shadow">
+        <div class="card-header text-center">
+            <h2 class="mb-0">Contacto</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <label>{{ form.name.label.text }}</label>
+                    {{ form.name(class="form-control", placeholder="Tu nombre") }}
+                </div>
+                <div class="form-group">
+                    <label>{{ form.email.label.text }}</label>
+                    {{ form.email(class="form-control", placeholder="correo@ejemplo.com") }}
+                </div>
+                <div class="form-group">
+                    <label>{{ form.message.label.text }}</label>
+                    {{ form.message(class="form-control", rows=4, placeholder="Escribe tu mensaje...") }}
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-paper-plane mr-2"></i>Enviar</button>
+            </form>
+        </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}
 

@@ -7,10 +7,9 @@
             <h2 class="mb-0">Gestión Global de Contenedores</h2>
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ url_for('admin.admin_search_containers') }}" class="form-inline mb-4">
-                {{ form.hidden_tag() }}
+            <form method="GET" action="{{ url_for('admin.admin_search_containers') }}" class="form-inline mb-4">
                 <div class="input-group w-100">
-                    {{ form.search_query(class="form-control", placeholder="Buscar por nombre, ubicación u objetos...") }}
+                    {{ form.search_query(class="form-control", placeholder="Buscar por nombre, ubicación u objetos...", **{"aria-label": "Buscar contenedores"}) }}
                     <div class="input-group-append">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search"></i> Buscar
@@ -37,7 +36,7 @@
                                 <td><strong>{{ container.name }}</strong></td>
                                 <td>{{ container.location }}</td>
                                 <td>
-                                    <span class="badge badge-secondary">{{ container.user.username }}</span>
+                                    <span class="badge badge-secondary">{{ container.user.username if container.user else '—' }}</span>
                                 </td>
                                 <td>
                                     <small class="text-muted">{{ container.items | join(', ') | truncate(50) }}</small>

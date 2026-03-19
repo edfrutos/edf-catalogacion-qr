@@ -1,17 +1,25 @@
 {% extends "layout.html" %}
-    {% block content %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <div class="modal-welcome">
-        <div class="modal-content-welcome">
-            <h1>EDF Catalogación QR</h1>
-            <h4>Has iniciado sesión correctamente.</h4>
-            <div class="button-group-welcome">
-                <button onclick="location.href='{{ url_for('main.account') }}'">Cuenta</button>
-                <button onclick="location.href='{{ url_for('main.list_containers') }}'">Mis Contenedores</button>
-                <button onclick="location.href='{{ url_for('main.contacto') }}'">Contacto</button>
-                <button onclick="location.href='{{ url_for('main.create_container') }}'">Crear Contenedor</button>
-            </div>
-        </div>
-    </div>
-    {% endblock %}
-
+{% block content %}
+<div class="hero-home">
+    <h1>¡Bienvenido, {{ current_user.username }}!</h1>
+    <p>Has iniciado sesión correctamente. ¿Qué te gustaría hacer?</p>
+</div>
+<div class="welcome-cards">
+    <a href="{{ url_for('main.account') }}" class="welcome-card">
+        <i class="fas fa-user"></i>
+        <span>Mi cuenta</span>
+    </a>
+    <a href="{{ url_for('main.list_containers') }}" class="welcome-card">
+        <i class="fas fa-boxes"></i>
+        <span>Mis contenedores</span>
+    </a>
+    <a href="{{ url_for('main.create_container') }}" class="welcome-card">
+        <i class="fas fa-plus-circle"></i>
+        <span>Crear contenedor</span>
+    </a>
+    <a href="{{ url_for('main.contacto') }}" class="welcome-card">
+        <i class="fas fa-envelope"></i>
+        <span>Contacto</span>
+    </a>
+</div>
+{% endblock %}

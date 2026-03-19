@@ -49,18 +49,14 @@ def view_user(user_id):
     user = User.objects(id=user_id).first_or_404()
     return render_template('admin/view_user.html', title='View User', user=user)
 
-@admin.route('/containers', methods=['GET', 'POST'])
+@admin.route('/containers', methods=['GET'])
 @admin_required
 def admin_search_containers():
     page = request.args.get('page', 1, type=int)
-    form = SearchContainerForm()
-    containers = None
     search_query = request.args.get('search_query', '')
-    
-    if form.validate_on_submit():
-        search_query = form.search_query.data
-        return redirect(url_for('admin.admin_search_containers', search_query=search_query))
-    
+    form = SearchContainerForm()
+    form.search_query.data = search_query
+
     if search_query:
         containers = Container.objects(
             Q(name__icontains=search_query) | Q(location__icontains=search_query) | Q(items__icontains=search_query)

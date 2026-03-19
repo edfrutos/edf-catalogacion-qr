@@ -1,8 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<div class="container">
-    <h2 class="text-center">Crear Contenedor</h2>
+<div class="container-list">
+    <div class="card card-app shadow">
+        <div class="card-header text-center">
+            <h2 class="mb-0">Crear contenedor</h2>
+        </div>
+        <div class="card-body">
     <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="form-group">
@@ -25,16 +28,9 @@
             {{ form.picture.label(class="form-control-label") }}
             {{ form.picture(class="form-control-file") }}
         </div>
-        <button type="submit" class="btn btn-primary">Crear Contenedor</button>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-plus mr-2"></i>Crear contenedor</button>
     </form>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="mt-4">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+        </div>
+    </div>
 </div>
 {% endblock %}

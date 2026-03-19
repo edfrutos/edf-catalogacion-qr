@@ -43,6 +43,10 @@
                                 </div>
                             </td>
                         </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No se encontraron usuarios.</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>

@@ -1,4 +1,4 @@
-from itsdangerous import TimedSerializer as Serializer
+from itsdangerous import URLSafeTimedSerializer as Serializer
 from flask_login import UserMixin
 from flask import current_app
 from app import db, login_manager, bcrypt

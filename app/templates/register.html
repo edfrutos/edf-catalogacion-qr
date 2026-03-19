@@ -1,40 +1,39 @@
 {% extends "layout.html" %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <h1>Registro</h1>
-    <form method="POST" action="{{ url_for('main.register') }}">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.username.label }}<br>
-            {{ form.username(class="form-control", size=32) }}<br>
-            {% for error in form.username.errors %}
-                <span style="color: red;">[{{ error }}]</span><br>
-            {% endfor %}
+<div class="auth-card">
+    <div class="card card-app shadow">
+        <div class="card-header text-center">
+            <h2 class="mb-0">Crear cuenta</h2>
         </div>
-        <div class="form-group">
-            {{ form.email.label }}<br>
-            {{ form.email(class="form-control", size=32) }}<br>
-            {% for error in form.email.errors %}
-                <span style="color: red;">[{{ error }}]</span><br>
-            {% endfor %}
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('main.register') }}">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <label for="username">{{ form.username.label.text }}</label>
+                    {{ form.username(class="form-control", autocomplete="username", placeholder="Nombre de usuario") }}
+                    {% for error in form.username.errors %}<small class="text-danger">{{ error }}</small>{% endfor %}
+                </div>
+                <div class="form-group">
+                    <label for="email">{{ form.email.label.text }}</label>
+                    {{ form.email(class="form-control", autocomplete="email", placeholder="correo@ejemplo.com") }}
+                    {% for error in form.email.errors %}<small class="text-danger">{{ error }}</small>{% endfor %}
+                </div>
+                <div class="form-group">
+                    <label for="password">{{ form.password.label.text }}</label>
+                    {{ form.password(class="form-control", autocomplete="new-password", placeholder="Contraseña") }}
+                    {% for error in form.password.errors %}<small class="text-danger">{{ error }}</small>{% endfor %}
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">{{ form.confirm_password.label.text }}</label>
+                    {{ form.confirm_password(class="form-control", autocomplete="new-password", placeholder="Repetir contraseña") }}
+                    {% for error in form.confirm_password.errors %}<small class="text-danger">{{ error }}</small>{% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary btn-block py-2">Registrarse</button>
+            </form>
+            <p class="text-center mt-3 mb-0 small text-muted">
+                ¿Ya tienes cuenta? <a href="{{ url_for('main.login') }}">Iniciar sesión</a>
+            </p>
         </div>
-        <div class="form-group">
-            {{ form.password.label }}<br>
-            {{ form.password(class="form-control", size=32) }}<br>
-            {% for error in form.password.errors %}
-                <span style="color: red;">[{{ error }}]</span><br>
-            {% endfor %}
-        </div>
-        <div class="form-group">
-            {{ form.confirm_password.label }}<br>
-            {{ form.confirm_password(class="form-control", size=32) }}<br>
-            {% for error in form.confirm_password.errors %}
-                <span style="color: red;">[{{ error }}]</span><br>
-            {% endfor %}
-        </div>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
-        </div>
-    </form>
-    <a href="{{ url_for('main.home') }}" class="btn btn-primary">Volver a Inicio</a>
+    </div>
+</div>
 {% endblock %}

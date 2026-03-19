@@ -1,63 +1,32 @@
 {% extends "layout.html" %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
-<!-- Mensajes -->
-<div id="mensaje-bienvenida" class="mensaje-home">
-  Bienvenid@ a EDF Catalogación QR
-  <span class="cerrar-home" onclick="cerrarMensaje('mensaje-bienvenida')">×</span>
-</div>
-
-<div id="mensaje-hasta-pronto" class="mensaje-home">
-  Hasta pronto!
-  <span class="cerrar-home" onclick="cerrarMensaje('mensaje-hasta-pronto')">×</span>
-  <p>Gracias por visitarnos. Esperamos verte de nuevo pronto.</p>
-  <button onclick="cerrarMensaje('mensaje-hasta-pronto')">Cerrar</button>
-</div>
-
-<div id="modal" class="modal-home">
-  <div class="modal-content-home">
-    <h1>Bienvenid@ <br>
-      a <br>
-      EDF Catalogación QR</h1>
-    <h5>Aplicación con la que sabrás en cualquier momento donde están todos tus objetos guardados en los diferentes contenedores que tu registres en esta misma aplicación.<br><br> De esta forma, puedes obtener información de en qué contenedor se encuentra, dónde está localizado dicho contenedor e inclusive adjuntar información gráfica (fotos) de los objetos buscados.<br><br> Todo ello mediante la lectura del QR que se genera al crear el registro con la identificación del objeto.</h5>
-    <button onclick="location.href='{{ url_for('main.welcome') }}'">Cerrar</button>
-  </div>
-</div>
-
-<div id="landscape" class="landscape-home">
-  <div class="content">
-    <h2>Catalogación de Objetos Diversos</h2>
-    <div class="buttons">
-      <button onclick="location.href='{{ url_for('main.home') }}'">Inicio</button>
-      <button onclick="location.href='{{ url_for('main.register') }}'">Registro</button>
-      <button onclick="location.href='{{ url_for('main.reset_request') }}'">Recuperación de Contraseña</button>
-      <button onclick="location.href='{{ url_for('main.contacto') }}'">Contacto</button>
+<div class="hero-home">
+    <h1>EDF Catalogación QR</h1>
+    <p>Organiza tus objetos en contenedores y localízalos al instante con códigos QR.</p>
+    {% if current_user.is_authenticated %}
+    <div class="hero-actions">
+        <a href="{{ url_for('main.list_containers') }}" class="btn btn-primary"><i class="fas fa-boxes mr-2"></i>Mis contenedores</a>
+        <a href="{{ url_for('main.create_container') }}" class="btn btn-outline-primary"><i class="fas fa-plus mr-2"></i>Crear contenedor</a>
+        <a href="{{ url_for('main.account') }}" class="btn btn-outline-secondary"><i class="fas fa-user mr-2"></i>Mi cuenta</a>
     </div>
-  </div>
+    {% else %}
+    <div class="hero-actions">
+        <a href="{{ url_for('main.login') }}" class="btn btn-primary"><i class="fas fa-sign-in-alt mr-2"></i>Iniciar sesión</a>
+        <a href="{{ url_for('main.register') }}" class="btn btn-outline-primary"><i class="fas fa-user-plus mr-2"></i>Registrarse</a>
+        <a href="{{ url_for('main.contacto') }}" class="btn btn-outline-secondary"><i class="fas fa-envelope mr-2"></i>Contacto</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card card-app">
+    <div class="card-body">
+        <h3 class="mb-3">¿Qué puedes hacer?</h3>
+        <ul class="mb-0" style="line-height: 2;">
+            <li>Registra contenedores con ubicación y descripción</li>
+            <li>Genera códigos QR únicos para cada contenedor</li>
+            <li>Escanea el QR para ver el contenido y la ubicación</li>
+            <li>Añade fotos y etiquetas para organizar mejor</li>
+        </ul>
+    </div>
 </div>
 {% endblock %}
-
-<script>
-function mostrarMensaje(id) {
-  var mensaje = document.getElementById(id);
-  if (mensaje) {
-    mensaje.style.display = 'block';
-  }
-}
-
-function cerrarMensaje(id) {
-  var mensaje = document.getElementById(id);
-  if (mensaje) {
-    mensaje.style.display = 'none';
-  }
-}
-
-// Mostrar el mensaje de bienvenida al cargar la página
-window.onload = function() {
-  mostrarMensaje('mensaje-bienvenida');
-  setTimeout(function() {
-    mostrarMensaje('mensaje-hasta-pronto');
-  }, 5000); // Muestra "Hasta pronto" después de 5 segundos
-};
-</script>
